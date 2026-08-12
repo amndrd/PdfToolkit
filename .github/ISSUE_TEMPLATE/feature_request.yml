@@ -1,0 +1,35 @@
+name: Feature request
+description: Suggest a new operation or an improvement
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: |
+        Describe the task, not the solution. "I scan double-sided documents and
+        the backs come out reversed" tells us more than "add a page-shuffle
+        option", and often has a better answer.
+    validations:
+      required: true
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: How do you do it today?
+      description: Another tool, a manual process, several Recto commands chained?
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like Recto to do?
+      description: A sketch of the command or API, if you have one in mind.
+      render: console
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This works on PDFs locally, without needing a network service
+        - label: I have checked `recto --help` and the README for an existing way

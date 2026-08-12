@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recto — local PDF toolkit</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='7' y='4' width='18' height='24' rx='3' fill='none' stroke='%23141310' stroke-width='2.5'/><path d='M18 4v6h7' fill='none' stroke='%23141310' stroke-width='2.5'/></svg>">
+</head>
+<body>
+
+<header class="masthead">
+  <button id="restart" type="button" class="btn btn-ghost hidden">Start over</button>
+</header>
+
+<main>
+
+  <!-- ─────────────────────────────────────────────────────── empty state -->
+  <section id="landing" class="landing">
+    <h1 class="display">Every PDF tool.<br><em>None</em> of the uploading.</h1>
+    <p class="lede">
+      Merge, split, rotate, extract, compress and protect — entirely on this
+      machine, with no account and no network.
+    </p>
+
+    <div id="dropcard" class="dropcard" tabindex="0" role="button"
+         aria-label="Drop files here, or press Enter to browse">
+      <svg class="dropcard-glyph" viewBox="0 0 48 48" aria-hidden="true">
+        <path d="M12 30v6a3 3 0 0 0 3 3h18a3 3 0 0 0 3-3v-6" fill="none"
+              stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M24 30V10m0 0-7 7m7-7 7 7" fill="none" stroke="currentColor"
+              stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <p class="dropcard-title">Drop files here</p>
+      <p class="dropcard-sub">or click to browse</p>
+    </div>
+
+    <p class="formats">PDF · PNG · JPEG · TIFF · WebP</p>
+  </section>
+
+  <!-- ────────────────────────────────────────────────────── working state -->
+  <section id="workspace" class="workspace hidden">
+
+    <!-- Tabs and tools -->
+    <nav class="console" aria-label="Tools">
+      <div id="tabs" class="tabs" role="tablist"></div>
+      <div id="tools" class="tools" role="tabpanel"></div>
+    </nav>
+
+    <!-- Options for the chosen tool -->
+    <div id="panel" class="panel hidden">
+      <div class="panel-head">
+        <h2 id="panel-title" class="panel-title"></h2>
+        <p id="panel-desc" class="panel-desc"></p>
+      </div>
+      <form id="optionsform" class="fields" autocomplete="off"></form>
+      <div class="panel-foot">
+        <p id="requirement" class="requirement"></p>
+        <button id="run" type="button" class="btn btn-primary" disabled>Run</button>
+      </div>
+    </div>
+
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+    <div id="results" class="results"></div>
+
+    <!-- The document -->
+    <div class="doc">
+      <div class="doc-bar">
+        <div id="filerail" class="filerail"></div>
+        <button id="addmore" type="button" class="btn btn-ghost">Add files</button>
+      </div>
+      <p id="pagehint" class="pagehint"></p>
+      <div id="pagegrid" class="pagegrid"></div>
+    </div>
+
+  </section>
+</main>
+
+<input id="picker" type="file" multiple hidden>
+<div id="dropveil" class="dropveil" aria-hidden="true"><span>Drop to add</span></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
