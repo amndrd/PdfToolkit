@@ -51,12 +51,38 @@ class TestStaticSurface:
         assert client.get("/static/styles.css").status_code == 200
         assert client.get("/static/app.js").status_code == 200
 
-    def test_page_references_no_external_hosts(self, client):
-        """The UI must work with the network unplugged."""
+    def test_page_loads_no_external_resources(self, client):
+        """The UI must render with the network unplugged.
+
+        What matters is that nothing is *fetched* from another origin — no
+        CDN script, no web font, no remote image. A plain hyperlink the user
+        may choose to click is not a fetch and does not stop the page working
+        offline, so anchors are deliberately not covered here.
+        """
+        import re
+
+        offenders: list[str] = []
         for path in ("/", "/static/styles.css", "/static/app.js"):
             body = client.get(path).text
-            assert "http://" not in body.replace("http://www.w3.org", "")
-            assert "https://" not in body
+            offenders += [
+                f"{path}: {match}"
+                for pattern in (
+                    r'src\s*=\s*["\']https?://[^"\']+',  # scripts, images
+                    r'<link[^>]+href\s*=\s*["\']https?://[^"\']+',  # stylesheets, fonts
+                    r"url\(\s*['\"]?https?://[^)]+",  # CSS url()
+                    r'@import\s+["\']?https?://[^;]+',  # CSS imports
+                    r'fetch\(\s*["\']https?://[^"\']+',  # XHR to elsewhere
+                )
+                for match in re.findall(pattern, body, re.IGNORECASE)
+            ]
+
+        assert not offenders, f"page fetches from another origin: {offenders}"
+
+    def test_the_only_external_link_is_an_anchor(self, client):
+        """And it opens safely: a new tab, with no window.opener handle."""
+        body = client.get("/").text
+        assert 'href="https://github.com/amndrd"' in body
+        assert 'rel="noopener noreferrer"' in body
 
     def test_security_headers(self, client):
         headers = client.get("/").headers

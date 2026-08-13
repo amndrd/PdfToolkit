@@ -802,12 +802,31 @@ ui.form.addEventListener("submit", (event) => event.preventDefault());
 /* Dropping anywhere in the window works, not just on the card. */
 let dragDepth = 0;
 
+/** Signal that a drop is being offered.
+ *
+ * On the landing screen the card itself is the target, so it fills and its
+ * label changes. Once files are loaded the card is gone, so a full-window
+ * veil stands in for it.
+ */
+function setDragging(on) {
+  const title = ui.dropcard.querySelector(".dropcard-title");
+  const onLanding = !ui.landing.classList.contains("hidden");
+
+  ui.dropcard.classList.toggle("dragging", on && onLanding);
+  ui.dropveil.classList.toggle("on", on && !onLanding);
+
+  if (title) {
+    title.textContent = on && onLanding
+      ? title.dataset.active
+      : title.dataset.idle;
+  }
+}
+
 window.addEventListener("dragenter", (event) => {
   event.preventDefault();
   dragDepth += 1;
   if (event.dataTransfer && [...event.dataTransfer.types].includes("Files")) {
-    ui.dropveil.classList.add("on");
-    ui.dropcard.classList.add("dragging");
+    setDragging(true);
   }
 });
 
@@ -816,17 +835,13 @@ window.addEventListener("dragover", (event) => event.preventDefault());
 window.addEventListener("dragleave", (event) => {
   event.preventDefault();
   dragDepth = Math.max(0, dragDepth - 1);
-  if (dragDepth === 0) {
-    ui.dropveil.classList.remove("on");
-    ui.dropcard.classList.remove("dragging");
-  }
+  if (dragDepth === 0) setDragging(false);
 });
 
 window.addEventListener("drop", (event) => {
   event.preventDefault();
   dragDepth = 0;
-  ui.dropveil.classList.remove("on");
-  ui.dropcard.classList.remove("dragging");
+  setDragging(false);
   addFiles(event.dataTransfer && event.dataTransfer.files);
 });
 

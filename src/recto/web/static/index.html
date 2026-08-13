@@ -10,6 +10,12 @@
 <body>
 
 <header class="masthead">
+  <a class="ghlink" href="https://github.com/amndrd" target="_blank"
+     rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="currentColor" d="M12 .5C5.37.5 0 5.87 0 12.5c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58 0-.29-.01-1.05-.02-2.06-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.33-1.76-1.33-1.76-1.09-.75.08-.73.08-.73 1.21.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6.01 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.49 5.93.43.37.82 1.1.82 2.22 0 1.6-.01 2.89-.01 3.29 0 .32.22.7.83.58A12.01 12.01 0 0 0 24 12.5C24 5.87 18.63.5 12 .5z"/>
+    </svg>
+  </a>
   <button id="restart" type="button" class="btn btn-ghost hidden">Start over</button>
 </header>
 
@@ -17,10 +23,10 @@
 
   <!-- ─────────────────────────────────────────────────────── empty state -->
   <section id="landing" class="landing">
-    <h1 class="display">Every PDF tool.<br><em>None</em> of the uploading.</h1>
+    <h1 class="display">Put your PDF <em>in order</em>.</h1>
     <p class="lede">
-      Merge, split, rotate, extract, compress and protect — entirely on this
-      machine, with no account and no network.
+      local-first PDF toolkit // CLI, offline browser UI, and Python library.
+      No uploads, no accounts, no network.
     </p>
 
     <div id="dropcard" class="dropcard" tabindex="0" role="button"
@@ -31,7 +37,8 @@
         <path d="M24 30V10m0 0-7 7m7-7 7 7" fill="none" stroke="currentColor"
               stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      <p class="dropcard-title">Drop files here</p>
+      <p class="dropcard-title" data-idle="Drop files here"
+         data-active="Drop to add">Drop files here</p>
       <p class="dropcard-sub">or click to browse</p>
     </div>
 
