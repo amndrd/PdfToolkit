@@ -42,5 +42,5 @@ First release.
   per session and loaded lazily, so a 300-page document costs no more than a
   3-page one until you scroll.
 
-[Unreleased]: https://github.com/amndrd/recto/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/amndrd/recto/releases/tag/v0.1.0
+[Unreleased]: https://github.com/amndrd/PdfToolkit/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/amndrd/PdfToolkit/releases/tag/v0.1.0

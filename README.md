@@ -3,7 +3,7 @@
 **A local-first PDF toolkit.** Merge, split, rotate, extract, compress, encrypt
 and convert PDFs — entirely on your own machine.
 
-[![CI](https://github.com/amndrd/recto/actions/workflows/ci.yml/badge.svg)](https://github.com/amndrd/recto/actions/workflows/ci.yml)
+[![CI](https://github.com/amndrd/PdfToolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/amndrd/PdfToolkit/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -107,7 +107,7 @@ $ python3 -m pipx ensurepath
 Now install Recto:
 
 ```console
-$ pipx install "recto[all] @ git+https://github.com/amndrd/recto"
+$ pipx install "recto[all] @ git+https://github.com/amndrd/PdfToolkit"
 ```
 
 ### The simpler way: pip
@@ -115,7 +115,7 @@ $ pipx install "recto[all] @ git+https://github.com/amndrd/recto"
 If you would rather not install pipx:
 
 ```console
-$ python3 -m pip install --user "recto[all] @ git+https://github.com/amndrd/recto"
+$ python3 -m pip install --user "recto[all] @ git+https://github.com/amndrd/PdfToolkit"
 ```
 
 <details>
@@ -134,7 +134,7 @@ unless you are tight on disk space.
 | `all` | all of the above | everything |
 
 Install just what you need with, for example,
-`pipx install "recto[optimize] @ git+https://github.com/amndrd/recto"`.
+`pipx install "recto[optimize] @ git+https://github.com/amndrd/PdfToolkit"`.
 If you later ask for a feature whose extra is missing, Recto tells you exactly
 what to install rather than failing with a confusing import error.
 </details>
@@ -259,7 +259,7 @@ then visit `http://localhost:9000`.
 You installed without `[all]`. Re-run the install command including it:
 
 ```console
-$ pipx install --force "recto[all] @ git+https://github.com/amndrd/recto"
+$ pipx install --force "recto[all] @ git+https://github.com/amndrd/PdfToolkit"
 ```
 </details>
 
@@ -272,7 +272,7 @@ $ pipx uninstall recto    # remove it completely
 ```
 
 With pip, use
-`pip install --upgrade --force-reinstall "recto[all] @ git+https://github.com/amndrd/recto"`
+`pip install --upgrade --force-reinstall "recto[all] @ git+https://github.com/amndrd/PdfToolkit"`
 and `pip uninstall recto`.
 </details>
 
@@ -283,8 +283,8 @@ and `pip uninstall recto`.
 If you want to read or change the code:
 
 ```console
-$ git clone https://github.com/amndrd/recto
-$ cd recto
+$ git clone https://github.com/amndrd/PdfToolkit
+$ cd PdfToolkit
 $ python3 -m venv .venv
 $ source .venv/bin/activate        # Windows: .venv\Scripts\activate
 $ pip install -e ".[dev]"
@@ -584,8 +584,8 @@ Contributions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) for the
 development setup, and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 ```console
-$ git clone https://github.com/amndrd/recto
-$ cd recto
+$ git clone https://github.com/amndrd/PdfToolkit
+$ cd PdfToolkit
 $ pip install -e ".[dev]"
 $ pytest
 $ ruff check . && mypy

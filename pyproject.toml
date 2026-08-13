@@ -74,10 +74,10 @@ dev = [
 recto = "recto.cli.app:main"
 
 [project.urls]
-Homepage = "https://github.com/amndrd/recto"
-Repository = "https://github.com/amndrd/recto"
-Issues = "https://github.com/amndrd/recto/issues"
-Changelog = "https://github.com/amndrd/recto/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/amndrd/PdfToolkit"
+Repository = "https://github.com/amndrd/PdfToolkit"
+Issues = "https://github.com/amndrd/PdfToolkit/issues"
+Changelog = "https://github.com/amndrd/PdfToolkit/blob/main/CHANGELOG.md"
 
 # --------------------------------------------------------------------------- #
 # Build

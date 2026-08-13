@@ -71,7 +71,7 @@ def render_error(error: BaseException) -> int:
     error_console.print(f"[err]unexpected error:[/err] {escape(str(error))}")
     error_console.print(
         "[dim]This is a bug. Please report it with the command you ran:\n"
-        "https://github.com/amndrd/recto/issues[/dim]"
+        "https://github.com/amndrd/PdfToolkit/issues[/dim]"
     )
     return 1
 

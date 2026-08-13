@@ -8,7 +8,7 @@ Use GitHub's [private vulnerability reporting][gh] on this repository
 (Security → Report a vulnerability). You should get an acknowledgement within
 a few days.
 
-[gh]: https://github.com/amndrd/recto/security/advisories/new
+[gh]: https://github.com/amndrd/PdfToolkit/security/advisories/new
 
 Useful things to include: what an attacker can achieve, the steps to reproduce
 it, the Recto version and OS, and a sample file if one is involved.
