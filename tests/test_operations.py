@@ -8,6 +8,8 @@ operation and *in what order* — not merely how many.
 
 from __future__ import annotations
 
+import os
+
 import pytest
 
 from conftest import make_pdf, page_widths
@@ -95,8 +97,17 @@ class TestParseSource:
         assert source.pages == "1-3"
         assert source.path.name == "report.pdf"
 
+    @pytest.mark.skipif(
+        os.name == "nt",
+        reason="Windows forbids ':' in filenames, so this ambiguity cannot arise there",
+    )
     def test_an_existing_path_always_wins(self, sample):
-        """A real file called `a:b.pdf` must not be read as a page range."""
+        """A real file called `a:b.pdf` must not be read as a page range.
+
+        Unix-only by nature: on Windows the colon is the drive and stream
+        separator and never appears in a filename, which is why the sibling
+        test below covers the case that *does* occur there.
+        """
         weird = sample.parent / "a:b.pdf"
         weird.write_bytes(sample.read_bytes())
         assert parse_source(str(weird)).pages is None
