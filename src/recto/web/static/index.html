@@ -23,14 +23,17 @@
 
   <!-- ─────────────────────────────────────────────────────── empty state -->
   <section id="landing" class="landing">
-    <h1 class="display">Put your PDF <em>in order</em>.</h1>
-    <p class="lede">
-      local-first PDF toolkit // CLI, offline browser UI, and Python library.
-      No uploads, no accounts, no network.
-    </p>
+    <!-- The page shows no heading, but the document still needs one. -->
+    <h1 class="sr-only">Recto — a local-first PDF toolkit</h1>
 
     <div id="dropcard" class="dropcard" tabindex="0" role="button"
          aria-label="Drop files here, or press Enter to browse">
+      <!-- The dashed frame is an SVG rather than a CSS outline so its dashes
+           can travel around the path: only stroke-dashoffset animates. -->
+      <svg class="dropframe" aria-hidden="true">
+        <rect width="100%" height="100%" rx="14" />
+      </svg>
+
       <svg class="dropcard-glyph" viewBox="0 0 48 48" aria-hidden="true">
         <path d="M12 30v6a3 3 0 0 0 3 3h18a3 3 0 0 0 3-3v-6" fill="none"
               stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
