@@ -11,6 +11,19 @@ fingerprint of the document that survives every operation Recto performs.
 
 from __future__ import annotations
 
+import os
+
+# Rich decides whether to emit ANSI escapes from the environment, and honours
+# FORCE_COLOR even while pytest is capturing. Several tests assert on the exact
+# text the CLI prints, so the environment is pinned here — before anything
+# imports recto.cli, whose Console objects read it at construction time.
+# Without this the suite passes locally and fails on any machine, or CI job,
+# that happens to set FORCE_COLOR.
+os.environ.pop("FORCE_COLOR", None)
+os.environ["NO_COLOR"] = "1"
+os.environ["TERM"] = "dumb"
+os.environ["COLUMNS"] = "120"  # pin wrapping too, so line breaks stay stable
+
 from collections.abc import Sequence
 from pathlib import Path
 

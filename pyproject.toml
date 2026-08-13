@@ -139,6 +139,9 @@ exclude_lines = [
 line-length = 90
 target-version = "py310"
 src = ["src", "tests"]
+# Ruff also formats Python inside Markdown fences. In documentation, aligned
+# trailing comments are a deliberate readability choice, so prose is left alone.
+extend-exclude = ["*.md"]
 
 [tool.ruff.lint]
 select = [
