@@ -53,7 +53,7 @@
 body {
   margin: 0;
   min-height: 100vh;
-  padding: 0 clamp(1rem, 4vw, 2.5rem) 4rem;
+  padding: .9rem clamp(1rem, 4vw, 2.5rem) 4rem;
   color: var(--ink);
   font: 15px/1.55 var(--sans);
   -webkit-font-smoothing: antialiased;
@@ -79,16 +79,130 @@ body {
   border: 0;
 }
 
-/* ─────────────────────────────────────────────────────────────── header ── */
+/* ────────────────────────────────────────────────────────────── nav bar ── */
 
-.masthead {
+.navbar {
+  position: sticky;
+  top: .9rem;
+  z-index: 60;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  min-height: 3.4rem;
+  gap: .75rem;
   max-width: var(--page);
-  margin: 0 auto;
-  padding: 1.1rem 0 .6rem;
+  margin: 0 auto 1rem;
+  padding: .5rem .6rem .5rem .8rem;
+  background: var(--surface);
+  border-radius: var(--pill);
+  box-shadow: var(--shadow-md);
+}
+
+.navtabs {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .1rem;
+  min-width: 0;
+}
+
+.navbar .ghlink,
+.navbar .btn { flex: none; }
+
+/* Kept in the layout while unusable, so the tabs do not jump sideways the
+   moment the first file lands. */
+.invisible { visibility: hidden; pointer-events: none; }
+
+/* Tab + its menu ------------------------------------------------------- */
+
+.navgroup { position: relative; }
+
+.tab {
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: .5rem .9rem;
+  border-radius: var(--pill);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color .15s, background .15s;
+}
+
+.tab:hover,
+.navgroup:focus-within .tab { color: var(--ink); background: var(--sunken); }
+
+/* The tab holding the current tool stays marked while the menu is shut. */
+.tab.holding { color: var(--ink); }
+.tab.holding::after {
+  content: "";
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin: 3px auto -7px;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  min-width: 12rem;
+  padding: .35rem;
+  display: grid;
+  gap: .1rem;
+  background: var(--surface);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .14s ease, visibility .14s ease, transform .14s ease;
+}
+
+/* Bridges the gap between tab and menu, so travelling down with the pointer
+   never crosses un-hovered ground and closes the menu underneath you. */
+.menu::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -10px;
+  height: 10px;
+}
+
+.navgroup:hover .menu,
+.navgroup:focus-within .menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.menu .tool {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  font: inherit;
+  font-size: .88rem;
+  padding: .5rem .75rem;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .12s, color .12s;
+}
+
+.menu .tool:hover { background: var(--sunken); }
+
+.menu .tool[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
 }
 
 .ghlink {
@@ -154,7 +268,7 @@ body {
   margin: 0 auto;
   /* Fill what the header and the body's bottom padding leave behind, so the
      card group lands in the optical centre of the window. */
-  min-height: calc(100vh - 7.9rem);
+  min-height: calc(100vh - 9.6rem);
   display: grid;
   align-content: center;
   justify-items: center;
@@ -244,84 +358,6 @@ body {
    content. Without this the tab strip pushes the whole page sideways on a
    narrow screen instead of scrolling inside its own container. */
 .workspace > * { min-width: 0; }
-
-/* Tabs + tools --------------------------------------------------------- */
-
-.console {
-  min-width: 0;
-  background: var(--surface);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-md);
-  padding: .5rem .5rem .8rem;
-  position: sticky;
-  top: .75rem;
-  z-index: 20;
-}
-
-.tabs {
-  display: flex;
-  min-width: 0;
-  gap: .1rem;
-  overflow-x: auto;
-  scrollbar-width: none;
-  padding: .1rem;
-}
-
-.tabs::-webkit-scrollbar { display: none; }
-
-.tab {
-  border: 0;
-  background: transparent;
-  color: var(--ink-3);
-  font: inherit;
-  font-size: .8rem;
-  font-weight: 600;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-  padding: .5rem .95rem;
-  border-radius: var(--pill);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: color .15s, background .15s;
-}
-
-.tab:hover { color: var(--ink-2); }
-
-.tab[aria-selected="true"] {
-  background: var(--sunken);
-  color: var(--ink);
-}
-
-.tools {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .4rem;
-  padding: .7rem .45rem 0;
-  margin-top: .5rem;
-  border-top: 1px solid var(--line);
-}
-
-.tool {
-  border: 1px solid var(--line-strong);
-  background: var(--surface);
-  color: var(--ink);
-  border-radius: var(--pill);
-  padding: .5rem 1.05rem;
-  font: inherit;
-  font-size: .87rem;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: border-color .15s, background .15s, color .15s, box-shadow .15s;
-}
-
-.tool:hover { box-shadow: var(--shadow-sm); }
-
-.tool[aria-pressed="true"] {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--on-accent);
-  font-weight: 600;
-}
 
 /* Options panel -------------------------------------------------------- */
 
@@ -717,17 +753,43 @@ body {
 
 /* Narrow screens -------------------------------------------------------- */
 
-@media (max-width: 620px) {
-  .masthead { padding-top: .8rem; min-height: 2.6rem; }
-  .landing { min-height: calc(100vh - 7.6rem); }
-  .console { position: static; }
+@media (max-width: 700px) {
+  /* The tabs take a line of their own. Sharing one with the two buttons left
+     them so little room that every tab landed on its own row. */
+  .navbar {
+    flex-wrap: wrap;
+    row-gap: .4rem;
+    border-radius: var(--r-lg);
+    padding: .5rem .55rem;
+  }
+
+  .navtabs { order: 3; flex: 1 0 100%; }
+  .tab { padding: .45rem .58rem; font-size: .72rem; }
+
+  /* Anchored to the bar rather than to the tab, so a menu spans the width
+     instead of hanging off the side of a narrow screen — which is what was
+     creating a horizontal scrollbar even while every menu was shut. */
+  .navgroup { position: static; }
+
+  .menu {
+    left: .55rem;
+    right: .55rem;
+    min-width: 0;
+    transform: translateY(-4px);
+  }
+
+  .navgroup:hover .menu,
+  .navgroup:focus-within .menu { transform: translateY(0); }
+
+  .landing { min-height: calc(100vh - 13rem); }
   .panel { padding: 1.1rem 1.1rem 1.2rem; }
   .fields { grid-template-columns: 1fr; }
   .panel-foot { flex-wrap: wrap; }
   .doc { padding: .7rem .6rem 1.1rem; }
   .filechip .label { max-width: 11ch; }
   .requirement { flex-basis: 100%; margin-bottom: .3rem; }
-  .btn-primary { width: 100%; }
+  /* Only the panel's Run button stretches — not "Start over" in the bar. */
+  .panel-foot .btn-primary { width: 100%; }
   .pagegrid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: .6rem; }
 }
 

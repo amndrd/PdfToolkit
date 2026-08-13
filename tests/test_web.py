@@ -349,18 +349,30 @@ class TestThumbnails:
 class TestInterfaceShell:
     """The static page has to carry the pieces app.js expects to find."""
 
-    def test_landing_and_workspace_both_exist(self, client):
+    def test_every_element_the_script_looks_up_exists(self, client):
+        """app.js resolves all of its elements by id as it loads.
+
+        Deriving the list from the script rather than hard-coding it means
+        this cannot quietly go stale: rename an id in one file and forget the
+        other, and the mismatch shows up here instead of as a dead interface
+        in the browser.
+        """
+        import re
+
+        script = client.get("/static/app.js").text
         body = client.get("/").text
-        for anchor in (
-            'id="landing"',
-            'id="workspace"',
-            'id="dropcard"',
-            'id="tabs"',
-            'id="tools"',
-            'id="pagegrid"',
-            'id="filerail"',
-        ):
-            assert anchor in body, f"index.html is missing {anchor}"
+
+        ids = set(re.findall(r'\bel\("([^"]+)"\)', script))
+        assert ids, "expected app.js to resolve its elements through el(...)"
+
+        missing = sorted(name for name in ids if f'id="{name}"' not in body)
+        assert not missing, f"app.js looks up ids index.html does not define: {missing}"
+
+    def test_the_shell_carries_the_navigation_bar(self, client):
+        body = client.get("/").text
+        assert 'class="navbar"' in body
+        assert 'id="navtabs"' in body
+        assert 'id="restart"' in body
 
     def test_workspace_starts_hidden(self, client):
         body = client.get("/").text

@@ -32,8 +32,7 @@ const ui = {
   dropveil: el("dropveil"),
   picker: el("picker"),
   addmore: el("addmore"),
-  tabs: el("tabs"),
-  tools: el("tools"),
+  navtabs: el("navtabs"),
   panel: el("panel"),
   panelTitle: el("panel-title"),
   panelDesc: el("panel-desc"),
@@ -442,34 +441,43 @@ function repaintPages() {
 
 const groups = () => [...new Set(state.tools.map((t) => t.group))];
 
-function renderTabs() {
-  ui.tabs.textContent = "";
-  groups().forEach((name) => {
-    const tab = node("button", "tab", name);
-    tab.type = "button";
-    tab.role = "tab";
-    tab.setAttribute("aria-selected", String(state.group === name));
-    tab.addEventListener("click", () => {
-      state.group = name;
-      renderTabs();
-      renderTools();
-    });
-    ui.tabs.appendChild(tab);
-  });
-}
+/** Build the whole bar: one tab per category, each opening a menu of tools.
+ *
+ * Opening is CSS-driven (`:hover` and `:focus-within`) so a pointer and a
+ * keyboard reach the menu the same way, with no open/closed state to keep in
+ * sync here.
+ */
+function renderNav() {
+  ui.navtabs.textContent = "";
 
-function renderTools() {
-  ui.tools.textContent = "";
-  state.tools
-    .filter((tool) => tool.group === state.group)
-    .forEach((tool) => {
-      const button = node("button", "tool", tool.label);
-      button.type = "button";
-      button.title = tool.description;
-      button.setAttribute("aria-pressed", String(state.tool === tool.id));
-      button.addEventListener("click", () => selectTool(tool.id));
-      ui.tools.appendChild(button);
+  groups().forEach((name) => {
+    const group = node("div", "navgroup");
+
+    const tools = state.tools.filter((tool) => tool.group === name);
+    const holding = tools.some((tool) => tool.id === state.tool);
+
+    const tab = node("button", `tab${holding ? " holding" : ""}`, name);
+    tab.type = "button";
+    tab.setAttribute("aria-haspopup", "true");
+    group.appendChild(tab);
+
+    const menu = node("div", "menu");
+    menu.setAttribute("role", "menu");
+    menu.setAttribute("aria-label", name);
+
+    tools.forEach((tool) => {
+      const item = node("button", "tool", tool.label);
+      item.type = "button";
+      item.setAttribute("role", "menuitem");
+      item.title = tool.description;
+      item.setAttribute("aria-pressed", String(state.tool === tool.id));
+      item.addEventListener("click", () => selectTool(tool.id));
+      menu.appendChild(item);
     });
+
+    group.appendChild(menu);
+    ui.navtabs.appendChild(group);
+  });
 }
 
 function selectTool(id) {
@@ -485,13 +493,32 @@ function selectTool(id) {
     state.active = state.selected[0];
   }
 
-  renderTools();
+  renderNav();
   renderPanel();
   renderFiles();
   renderPages();
   updateRun();
   setStatus("");
   ui.results.textContent = "";
+  updateDropLabel();
+
+  // Moving focus out of the menu is what shuts it, and it also puts a keyboard
+  // user straight into the options they just asked for.
+  const landed = ui.panel.querySelector("input, select") || ui.run;
+  if (landed && !ui.workspace.classList.contains("hidden")) {
+    landed.focus({ preventScroll: true });
+  } else if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
+  }
+}
+
+/** With no files yet, the drop card is the only place to report the choice. */
+function updateDropLabel() {
+  const title = ui.dropcard.querySelector(".dropcard-title");
+  const tool = currentTool();
+  if (!title) return;
+  title.dataset.idle = tool ? `Drop files to ${tool.label.toLowerCase()}` : "Drop files here";
+  if (!ui.dropcard.classList.contains("dragging")) title.textContent = title.dataset.idle;
 }
 
 /* ═══════════════════════════════════════════════════════════════════ panel */
@@ -749,18 +776,13 @@ function renderResults(data) {
 function enterWorkspace() {
   ui.landing.classList.add("hidden");
   ui.workspace.classList.remove("hidden");
-  ui.restart.classList.remove("hidden");
-  if (!state.tool) {
-    state.group = state.group || groups()[0];
-    renderTabs();
-    renderTools();
-    selectTool(state.tools[0].id);
-  }
+  ui.restart.classList.remove("invisible");
+  if (!state.tool) selectTool(state.tools[0].id);
 }
 
 function leaveWorkspace() {
   ui.workspace.classList.add("hidden");
-  ui.restart.classList.add("hidden");
+  ui.restart.classList.add("invisible");
   ui.landing.classList.remove("hidden");
   ui.results.textContent = "";
   setStatus("");
@@ -793,6 +815,12 @@ ui.restart.addEventListener("click", startOver);
 ui.picker.addEventListener("change", () => {
   addFiles(ui.picker.files);
   ui.picker.value = "";
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape") return;
+  const active = document.activeElement;
+  if (active instanceof HTMLElement && active.closest(".navgroup")) active.blur();
 });
 
 ui.run.addEventListener("click", runTool);
@@ -851,8 +879,7 @@ window.addEventListener("drop", (event) => {
     state.tools = data.tools;
     state.previews = data.previews !== false;
     state.group = groups()[0];
-    renderTabs();
-    renderTools();
+    renderNav();
   } catch (error) {
     setStatus(`Could not reach the Recto server: ${error.message}`, "error");
   }
