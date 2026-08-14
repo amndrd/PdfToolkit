@@ -25,6 +25,8 @@ const state = {
 
 const el = (id) => document.getElementById(id);
 const ui = {
+  navbar: el("navbar"),
+  doc: el("doc"),
   landing: el("landing"),
   workspace: el("workspace"),
   restart: el("restart"),
@@ -776,12 +778,14 @@ function renderResults(data) {
 function enterWorkspace() {
   ui.landing.classList.add("hidden");
   ui.workspace.classList.remove("hidden");
+  ui.navbar.classList.add("in");
   ui.restart.classList.remove("invisible");
   if (!state.tool) selectTool(state.tools[0].id);
 }
 
 function leaveWorkspace() {
   ui.workspace.classList.add("hidden");
+  ui.navbar.classList.remove("in");
   ui.restart.classList.add("invisible");
   ui.landing.classList.remove("hidden");
   ui.results.textContent = "";
@@ -799,6 +803,15 @@ async function startOver() {
     ids.map((id) => api(`/api/files/${id}`, { method: "DELETE" }).catch(() => {}))
   );
 }
+
+/* Publish the bar's height so the workspace can clear it. Measured rather
+   than assumed, because the bar wraps to two rows on a narrow screen. */
+function publishBarHeight() {
+  const height = ui.navbar.getBoundingClientRect().height;
+  if (height) document.documentElement.style.setProperty("--bar-h", `${height}px`);
+}
+
+new ResizeObserver(publishBarHeight).observe(ui.navbar);
 
 /* ═════════════════════════════════════════════════════════════════ wiring */
 
