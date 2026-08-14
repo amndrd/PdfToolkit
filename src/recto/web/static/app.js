@@ -368,8 +368,10 @@ function describePages(file, field) {
   if (file.encrypted) return "Locked — enter the password below to work on this file.";
   if (file.error) return file.error;
   if (!field) {
-    const tool = currentTool();
-    return tool ? `${file.name} · ${file.pages || 0} pages` : "Pick a tool above.";
+    const count = `${file.pages || 0} page${file.pages === 1 ? "" : "s"}`;
+    return currentTool()
+      ? `${file.name} · ${count}`
+      : `${file.name} · ${count} — choose a tool above to get started.`;
   }
   if (!state.sequence.length) {
     return fieldIsOrdered(field)
@@ -501,6 +503,8 @@ function selectTool(id) {
     state.active = state.selected[0];
   }
 
+  const panelWasHidden = ui.panel.classList.contains("hidden");
+
   renderNav();
   renderPanel();
   renderFiles();
@@ -508,7 +512,15 @@ function selectTool(id) {
   updateRun();
   setStatus("");
   ui.results.textContent = "";
-  updateDropLabel();
+
+  // Arriving for the first time, the card announces itself rather than
+  // shoving the document down without explanation.
+  if (MOTION_OK && panelWasHidden && !ui.panel.classList.contains("hidden")) {
+    ui.panel.animate(
+      [{ opacity: 0, transform: "translateY(-10px)" }, { opacity: 1, transform: "none" }],
+      { duration: 300, easing: "cubic-bezier(.22, .9, .28, 1)" },
+    );
+  }
 
   // Moving focus out of the menu is what shuts it, and it also puts a keyboard
   // user straight into the options they just asked for.
@@ -518,15 +530,6 @@ function selectTool(id) {
   } else if (document.activeElement instanceof HTMLElement) {
     document.activeElement.blur();
   }
-}
-
-/** With no files yet, the drop card is the only place to report the choice. */
-function updateDropLabel() {
-  const title = ui.dropcard.querySelector(".dropcard-title");
-  const tool = currentTool();
-  if (!title) return;
-  title.dataset.idle = tool ? `Drop files to ${tool.label.toLowerCase()}` : "Drop files here";
-  if (!ui.dropcard.classList.contains("dragging")) title.textContent = title.dataset.idle;
 }
 
 /* ═══════════════════════════════════════════════════════════════════ panel */
@@ -831,10 +834,12 @@ async function growCardIntoWorkspace() {
       { duration: 300, delay: 250, easing: "ease-out", fill: "backwards" });
   }
 
-  ui.panel.animate(
-    [{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }],
-    { duration: 320, delay: 300, easing: ease, fill: "backwards" },
-  );
+  if (!ui.panel.classList.contains("hidden")) {
+    ui.panel.animate(
+      [{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }],
+      { duration: 320, delay: 300, easing: ease, fill: "backwards" },
+    );
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════════ states */
@@ -844,7 +849,8 @@ function enterWorkspace() {
   ui.workspace.classList.remove("hidden");
   ui.navbar.classList.add("in");
   ui.restart.classList.remove("invisible");
-  if (!state.tool) selectTool(state.tools[0].id);
+  // No tool is picked on the user's behalf: until they choose one from the
+  // bar, the files are all there is to see.
 }
 
 function leaveWorkspace() {
@@ -873,6 +879,9 @@ async function startOver() {
   state.selected = [];
   state.active = null;
   state.sequence = [];
+  state.tool = null;
+  renderNav();
+  renderPanel();
   leaveWorkspace();
 
   if (MOTION_OK) {
