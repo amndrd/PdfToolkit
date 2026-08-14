@@ -160,6 +160,9 @@ function setStatus(message, kind) {
   ui.status.className = `status${kind ? ` ${kind}` : ""}`;
 }
 
+const MOTION_OK = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const currentTool = () => state.tools.find((t) => t.id === state.tool) || null;
 const activeFile = () => state.files.find((f) => f.id === state.active) || null;
 
@@ -196,10 +199,13 @@ async function addFiles(fileList) {
     if (!state.active && data.files.length) state.active = data.files[0].id;
 
     setStatus("");
-    enterWorkspace();
-    renderFiles();
-    renderPages();
-    updateRun();
+    if (ui.landing.classList.contains("hidden")) {
+      renderFiles();
+      renderPages();
+      updateRun();
+    } else {
+      await growCardIntoWorkspace();
+    }
   } catch (error) {
     setStatus(error.message, "error");
   }
@@ -773,6 +779,64 @@ function renderResults(data) {
   ui.results.appendChild(card);
 }
 
+/* ═════════════════════════════════════════════════════════════ transitions */
+
+/** Grow the drop card into the document card.
+ *
+ * A FLIP: measure where the card is, swap the interface over, measure where
+ * the document card landed, then play the second element from the first one's
+ * rectangle back to its own. The scale is markedly non-uniform, which is why
+ * the card is emptied first — what stretches is blank white, and the contents
+ * fade in only once the shape has settled.
+ */
+async function growCardIntoWorkspace() {
+  const from = ui.dropcard.getBoundingClientRect();
+
+  if (MOTION_OK) {
+    ui.dropcard.classList.add("emptying");
+    await wait(170);
+  }
+
+  enterWorkspace();
+  renderFiles();
+  renderPages();
+  updateRun();
+  ui.dropcard.classList.remove("emptying");
+
+  if (!MOTION_OK) return;
+
+  const to = ui.doc.getBoundingClientRect();
+  if (!to.width || !to.height) return;
+
+  const ease = "cubic-bezier(.22, .9, .28, 1)";
+  ui.doc.animate(
+    [
+      {
+        // `transform-origin` has to be the top-left corner. Scaling about the
+        // default centre moves the corners too, so the card would begin a
+        // couple of hundred pixels from where the drop card actually sat.
+        transformOrigin: "0 0",
+        transform: `translate(${from.left - to.left}px, ${from.top - to.top}px)`
+          + ` scale(${from.width / to.width}, ${from.height / to.height})`,
+      },
+      { transformOrigin: "0 0", transform: "none" },
+    ],
+    { duration: 460, easing: ease },
+  );
+
+  // `fill: backwards` holds these at opacity 0 through the delay, so the
+  // contents stay hidden while the card is still changing shape.
+  for (const child of ui.doc.children) {
+    child.animate([{ opacity: 0 }, { opacity: 1 }],
+      { duration: 300, delay: 250, easing: "ease-out", fill: "backwards" });
+  }
+
+  ui.panel.animate(
+    [{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }],
+    { duration: 320, delay: 300, easing: ease, fill: "backwards" },
+  );
+}
+
 /* ══════════════════════════════════════════════════════════════════ states */
 
 function enterWorkspace() {
@@ -794,11 +858,29 @@ function leaveWorkspace() {
 
 async function startOver() {
   const ids = state.files.map((f) => f.id);
+
+  if (MOTION_OK) {
+    const leaving = ui.workspace.animate(
+      [{ opacity: 1 }, { opacity: 0, transform: "translateY(12px) scale(.985)" }],
+      { duration: 240, easing: "ease-in", fill: "forwards" },
+    );
+    ui.navbar.classList.remove("in");
+    await leaving.finished;
+    leaving.cancel();
+  }
+
   state.files = [];
   state.selected = [];
   state.active = null;
   state.sequence = [];
   leaveWorkspace();
+
+  if (MOTION_OK) {
+    ui.landing.animate(
+      [{ opacity: 0, transform: "scale(.96)" }, { opacity: 1, transform: "none" }],
+      { duration: 340, easing: "cubic-bezier(.22, .9, .28, 1)" },
+    );
+  }
   await Promise.all(
     ids.map((id) => api(`/api/files/${id}`, { method: "DELETE" }).catch(() => {}))
   );
