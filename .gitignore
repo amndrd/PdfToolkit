@@ -33,3 +33,7 @@ Thumbs.db
 /scratch/
 /out/
 *.local.pdf
+
+# Local environment
+.env
+.ipynb_checkpoints/
